@@ -1,0 +1,15 @@
+[Reddit]
+username = 
+password = 
+client_id = 
+client_secret = 
+redirect_uri = http://127.0.0.1:8080
+
+[BOT]
+environment = DEV
+dev_user = 
+
+[SearchSubs]
+republican=right
+socialism=left
+libertarian=libertarian
