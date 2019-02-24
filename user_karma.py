@@ -86,19 +86,37 @@ def get_user_summary(User_Karma, SortedSearchSubs):
     Sorted_SubTotals = {k: v for k, v in sorted(SubTotals.items(), key=lambda x: x[1])}
     Sorted_CatTotals = {k: v for k, v in sorted(CatTotals.items(), key=lambda x: x[1])}
 
-    TopCat = list(Sorted_CatTotals.keys())[-1]
-    TopSub = list(Sorted_SubTotals.keys())[-1]
-    SecondSub = list(Sorted_SubTotals.keys())[-2]
-    TopCat_pct = truediv(Sorted_CatTotals[TopCat], UserTotal) * 100
-        
+    if len(list(Sorted_CatTotals.keys())) >= 1:
+        TopCat = list(Sorted_CatTotals.keys())[-1]
+        TopCat_pct = truediv(Sorted_CatTotals[TopCat], UserTotal) * 100
+    else:
+        TopCat = ""
+        TopCat_pct = 0
+
+    if len(list(Sorted_SubTotals.keys())) >= 1:
+        TopSub = list(Sorted_SubTotals.keys())[-1]
+    else:
+        TopSub = ""
+
+    if len(list(Sorted_SubTotals.keys())) >= 2:
+        SecondSub = list(Sorted_SubTotals.keys())[-2]
+    else:
+        SecondSub= ""
+
 
     if TopCat_pct > 75:
         leansword="leans heavy"
-    elif TopCat_pct > 60:
+    elif TopCat_pct > 50:
         leansword="leans"
-    else:
+    elif TopCat_pct > 25:
         leansword="leans slightly"
-    usersummary = "%s (%2.2f%%) %s" % (leansword, TopCat_pct, TopCat)
+    else:
+        leansword="undetermined only"
+
+    if TopCat_pct > 10:
+        usersummary = "%s (%2.2f%%) %s" % (leansword, TopCat_pct, TopCat)
+    else:
+        usersummary = "Sorry, not enough user activty for anaysis"
 
     if "communis" in TopSub.lower() or "communis" in SecondSub.lower():
         #withword=" and is probably a communist who calls everyone comrade"

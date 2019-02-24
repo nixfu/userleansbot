@@ -38,7 +38,7 @@ Search_Sub_List = list(config['SearchSubs'].keys())
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=client_secret,
                      password=bot_password,
-                     user_agent='User Leans Bot',
+                     user_agent='User Leans Bot by /u/nixfu',
                      username=bot_username)
 
 ENVIRONMENT = config.get("BOT", "environment")
