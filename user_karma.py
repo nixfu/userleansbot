@@ -43,16 +43,17 @@ def get_user_karma(Search_User,Search_Subs_List):
     s_count = 0
     submissions = get_author_submissions(author=Search_User,size=1000,sort='desc',sort_type='created_utc')
     for submit in submissions:
-        submitsub=submit['subreddit'].lower()
-        if submitsub in Search_Subs_List:
-            if submitsub not in User_Karma:
-                User_Karma[submitsub] = {}
-                User_Karma[submitsub]['c_karma'] = 0
-                User_Karma[submitsub]['c_count'] = 0
-                User_Karma[submitsub]['s_karma'] = 0
-                User_Karma[submitsub]['s_count'] = 0
-            User_Karma[submitsub]['s_karma'] += submit['score']
-            User_Karma[submitsub]['s_count'] += 1
+        if 'subreddit' in submit:
+            submitsub=submit['subreddit'].lower()
+            if submitsub in Search_Subs_List:
+                if submitsub not in User_Karma:
+                    User_Karma[submitsub] = {}
+                    User_Karma[submitsub]['c_karma'] = 0
+                    User_Karma[submitsub]['c_count'] = 0
+                    User_Karma[submitsub]['s_karma'] = 0
+                    User_Karma[submitsub]['s_count'] = 0
+                User_Karma[submitsub]['s_karma'] += submit['score']
+                User_Karma[submitsub]['s_count'] += 1
 
     return User_Karma
 
