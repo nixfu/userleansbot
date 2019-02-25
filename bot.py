@@ -194,6 +194,11 @@ def try_send_report(message, report_user, from_user):
     else:
         itemlink=""
 
+    # lets not respond to requests about the bot
+    if report_user == bot_user:
+        logger.info("# Not sending report about myself, requested by %s %s" % (from_user, itemlink))
+        return
+
     logger.info("Sending Report about %s to %s %s" % (report_user, from_user, itemlink))
 
     User_Karma = get_user_karma(report_user, Search_Sub_List)
