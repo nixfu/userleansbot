@@ -122,7 +122,7 @@ def get_useraccount_age(user):
 
         # detect birthday
         if now.month == created.month and now.day == created.day:
-            userage += " **TODAY IS CAKEDAY**"
+            userage += " **[HAPPY CAKEDAY]**"
 
     return userage
 
