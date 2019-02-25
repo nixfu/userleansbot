@@ -114,12 +114,16 @@ def get_useraccount_age(user):
         months = difference.months
         days = difference.days
         if years > 0:
-            userage = "%s years, %s months, %s days" % (years, months, days)
+            userage = "%s years, %s months, %s days ago" % (years, months, days)
         elif months > 0:
-            userage = "%s months, %s days" % (months, days)
+            userage = "%s months, %s days ago" % (months, days)
         else:
-            userage = "%s days" % (days)
-        
+            userage = "%s days ago" % (days)
+
+        # detect birthday
+        if now.month == created.month and now.day == created.day:
+            userage += " **TODAY IS CAKEDAY**"
+
     return userage
 
 def check_mentions():
@@ -201,7 +205,7 @@ def try_send_report(message, report_user, from_user):
     userreport += "___\n"
     userreport += "Analysis of /u/%s's activity in political subreddits over the past 1000 comments and submissions.\n" % report_user
     userreport += "\n"
-    userreport += "Account Created: %s ago\n" % (useraccountage)
+    userreport += "Account Created: %s\n" % (useraccountage)
     userreport += "\n"
     userreport += "Summary: **%s**\n" % (usersummary)
     userreport += "\n"
