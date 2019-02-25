@@ -136,7 +136,7 @@ def check_mentions():
         if message.was_comment:
             parent=message.parent()
             if parent.id in CACHE_REPLIES: 
-                continue
+                logger.info("* possible dupe parentid=%s" % parent.id)
             process_mention(message)
         else:
             process_pm(message)
