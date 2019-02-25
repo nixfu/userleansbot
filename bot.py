@@ -14,6 +14,9 @@ from enum import Enum
 import praw
 from user_karma import get_user_karma, get_user_summary
 import operator
+from datetime import datetime 
+from dateutil import relativedelta
+
 
 # =============================================================================
 # GLOBALS
@@ -76,16 +79,18 @@ class ParseMessageStatus(Enum):
     SUCCESS = 1
     SYNTAX_ERROR = 2
 
-
 class CommandType(Enum):
     REPORT_DIRECT = 1
     REPORT_PARENT = 2
     UNKNOWN = 3
 
-
 class CommandRegex:
     commandsearch = r'^(\/*u*\/*{bot_username})+\s*\/*u*\/*(\w*)\s*$'.format(bot_username=bot_username)
     pm_commandsearch = r'^\/*u*\/*(\w*)\s*$'
+
+# =============================================================================
+# FUNCTIONS
+# =============================================================================
 
 def send_dev_pm(subject, body):
     """
@@ -95,6 +100,27 @@ def send_dev_pm(subject, body):
     """
     reddit.redditor(DEV_USER_NAME).message(subject, body)
 
+def get_useraccount_age(user):
+    """
+    gets the user account age
+    """
+    userage = "unknown"
+    if user:
+        created_utc = int(reddit.redditor(user).created_utc)
+        created = datetime.fromtimestamp(created_utc)
+        now = datetime.now()
+        difference = relativedelta.relativedelta(now, created)
+        years = difference.years
+        months = difference.months
+        days = difference.days
+        if years > 0:
+            userage = "%s years, %s months, %s days" % (years, months, days)
+        elif months > 0:
+            userage = "%s months, %s days" % (months, days)
+        else:
+            userage = "%s days" % (days)
+        
+    return userage
 
 def check_mentions():
     """
@@ -168,14 +194,16 @@ def try_send_report(message, report_user, from_user):
 
     User_Karma = get_user_karma(report_user, Search_Sub_List)
     usersummary = get_user_summary(User_Karma,SortedSearchSubs)
-    
+    useraccountage = get_useraccount_age(report_user)
 
     # reply to user
     userreport = "Author: /u/userleansbot\n"
     userreport += "___\n"
     userreport += "Analysis of /u/%s's activity in political subreddits over the past 1000 comments and submissions.\n" % report_user
     userreport += "\n"
-    userreport += "Summary: **%s**\n" % usersummary
+    userreport += "Account Age: %s\n" % (useraccountage)
+    userreport += "\n"
+    userreport += "Summary: **%s**\n" % (usersummary)
     userreport += "\n"
     userreport += " Subreddit|Lean|No. of comments|Total comment karma|No. of posts|Total post karma\n"
     userreport += " :--|:--|:--|:--|:--|:--|:--|:--\n"
