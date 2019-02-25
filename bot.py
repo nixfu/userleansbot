@@ -201,7 +201,7 @@ def try_send_report(message, report_user, from_user):
     userreport += "___\n"
     userreport += "Analysis of /u/%s's activity in political subreddits over the past 1000 comments and submissions.\n" % report_user
     userreport += "\n"
-    userreport += "Account Age: %s\n" % (useraccountage)
+    userreport += "Account Created: %s ago\n" % (useraccountage)
     userreport += "\n"
     userreport += "Summary: **%s**\n" % (usersummary)
     userreport += "\n"
