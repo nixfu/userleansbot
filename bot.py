@@ -152,8 +152,9 @@ def process_pm(message):
     if pmcommand_match and pmcommand_match.group(1):
         try_send_report(message, pmcommand_match.group(1), message.author.name)
     else:
-        logger.info("Sending UNKNOWN COMMAND message to %s" % message.author.name)
-        message.reply('UNKNOWN COMMAND!')
+        if message.author.name:
+            logger.info("Sending UNKNOWN COMMAND message to %s" % message.author.name)
+            message.reply('UNKNOWN COMMAND!')
 
 
 def process_mention(mention):
@@ -195,7 +196,7 @@ def try_send_report(message, report_user, from_user):
         itemlink=""
 
     # lets not respond to requests about the bot
-    if report_user == bot_user:
+    if report_user == bot_username:
         logger.info("# Not sending report about myself, requested by %s %s" % (from_user, itemlink))
         return
 
