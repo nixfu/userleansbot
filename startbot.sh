@@ -10,9 +10,9 @@ BOTDIR="/home/redditbot/github/bots/userleansbot"
 cd $BOTDIR
 
 
-if ! ps -ef |grep -v grep | grep -q "python3 bot.py"; then
+if ! ps -ef |grep -v grep | grep -q "python3 -u bot.py"; then
 	#tmux new-session -d -s userleansbot 'python3 bot.py'
-    	/usr/bin/screen -dmS userleansbot python3 bot.py
+    	/usr/bin/screen -dmS userleansbot python3 -u bot.py
 else
 	#echo "Bot running" >> ${BOTDIR}/cron.log
 	exit 0
