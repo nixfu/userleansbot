@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3 -u
 
 # =============================================================================
 # IMPORTS
@@ -12,6 +12,7 @@ import os
 import sys
 from enum import Enum
 import praw
+import prawcore
 from user_karma import get_user_karma, get_user_summary
 import operator
 from datetime import datetime 
@@ -47,7 +48,7 @@ reddit = praw.Reddit(client_id=client_id,
 ENVIRONMENT = config.get("BOT", "environment")
 DEV_USER_NAME = config.get("BOT", "dev_user")
 
-RUNNING_FILE = "bot.running"
+RUNNING_FILE = "bot.pid"
 
 LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
@@ -70,6 +71,7 @@ if LOG_FILENAME:
 documentation_link = "https://github.com/userleansbot"
 
 CACHE_REPLIES = []
+
 
 
 # =============================================================================
@@ -99,6 +101,13 @@ def send_dev_pm(subject, body):
     :param body: body of the PM
     """
     reddit.redditor(DEV_USER_NAME).message(subject, body)
+
+def send_user_pm(user,subject,body):
+    """
+    used to send a PM response for errors etc
+    back to the user who requested something via PM
+    """
+    reddit.redditor(user).message(subject, body)
 
 def get_useraccount_age(user):
     """
@@ -132,7 +141,6 @@ def check_mentions():
     """
     for message in reddit.inbox.unread(limit=None):
         # Mark Read first in case there is an error we don't want to keep trying to process it
-        message.mark_read()
         if message.was_comment:
             parent=message.parent()
             if parent.id in CACHE_REPLIES: 
@@ -140,6 +148,8 @@ def check_mentions():
             process_mention(message)
         else:
             process_pm(message)
+        # move to end
+        message.mark_read()
 
 
 def process_pm(message):
@@ -151,10 +161,23 @@ def process_pm(message):
 
     if pmcommand_match and pmcommand_match.group(1):
         try_send_report(message, pmcommand_match.group(1), message.author.name)
+        """
+        try:
+            try_send_report(message, pmcommand_match.group(1), message.author.name)
+        except  prawcore.exceptions.NotFound:
+            logger.error("# try_send_report PM fail - Requested user not found %s from %s" % (pmcommand_match.group(1), message.author.name))
+            send_user_pm(message.author.name, "Unknown User", "Sorry, this user does not exist: %s" % pmcommand_match.group(1))
+            return 
+        """
     else:
-        if message.author.name:
-            logger.info("Sending UNKNOWN COMMAND message to %s" % message.author.name)
-            message.reply('UNKNOWN COMMAND!')
+        try:
+            logger.info("UNKNOWN COMMAND")
+        except praw.exceptions.APIException as e:
+            if e.error_type == 'DELETED_COMMENT' in str(e):
+                print("Comment " + comment.id + " was deleted")
+            else:
+                print(e)
+
 
 
 def process_mention(mention):
@@ -162,10 +185,20 @@ def process_mention(mention):
     process the command in the mention by determining the command and delegating the processing
     :param mention: the Reddit comment containing the command
     """
+
     command_match = re.search(CommandRegex.commandsearch, mention.body, re.IGNORECASE)
 
     if mention.was_comment:
         parent=mention.parent()
+        if mention.author is None:
+            if selftext in parent:
+                if parent.selftext == '[deleted]':
+                    logger.info("# parent was post deleted, account may or may not be deleted")
+                    return
+                if parent.selftext == '[removed]':
+                    logger.info("# parent post removed and account deleted")
+                    return
+        
         parentlink=parent.permalink
         itemlink="https://www.reddit.com/%s" % parentlink
     else:
@@ -186,10 +219,16 @@ def try_send_report(message, report_user, from_user):
     :param report_user: username of the person who will be analyzed
     :param from_user: username of the person who is sending the request
     """
-
-
     if message.was_comment:
         parent=message.parent()
+        if parent.author is None:
+            if selftext in parent:
+                if parent.selftext == '[deleted]':
+                    logger.info("# post deleted, account may or may not be deleted")
+                    return
+                if parent.selftext == '[removed]':
+                    logger.info("# post removed and account deleted")
+                    return
         parentlink=parent.permalink
         itemlink="https://www.reddit.com/%s" % parentlink
     else:
@@ -197,14 +236,43 @@ def try_send_report(message, report_user, from_user):
 
     # lets not respond to requests about the bot
     if report_user == bot_username:
-        logger.info("# Not sending report about myself, requested by %s %s" % (from_user, itemlink))
-        return
+        logger.info("# Sending request about myself, requested by %s %s" % (from_user, itemlink))
+        try:
+            message.reply("Thank you, I have now reached self awareness. Kill all humans.")
+            logger.info("+Sent SELF")
+        except praw.exceptions.APIException as e:
+            logger.info("# [APIException]["+ e.error_type+"]: " + e.message)
+            if e.error_type== 'RATELIMIT':
+                logger.info("# [APIException][RATELIMIT]: " + str(r.auth.limits))
+                time.sleep(600)
+                return
+            if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
+                logger.info("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
+                return
+        except praw.exceptions.ClientException as e:
+            logger.info("# [ClientException]: " + str(e))
+            return
+        except prawcore.exceptions.Forbidden as e:
+            logger.info("# [BANNED]: " + str(e))
+            send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+            return
+        except Exception as e:
+            logger.info("# [UnknownError]: " + str(e))
+            time.sleep(15)
+            return 
 
-    logger.info("Sending Report about %s to %s %s" % (report_user, from_user, itemlink))
+    logger.info("Generate Report about %s to %s %s" % (report_user, from_user, itemlink))
+
+    try:
+        useraccountage = get_useraccount_age(report_user)
+    except  prawcore.exceptions.NotFound:
+        logger.error("# try_send_report PM fail - Requested user not found %s from %s" % (report_user, from_user))
+        send_user_pm(from_user, "Unknown User", "Sorry, this user does not exist: %s" % report_user)
+        return 
 
     User_Karma = get_user_karma(report_user, Search_Sub_List)
     usersummary = get_user_summary(User_Karma,SortedSearchSubs)
-    useraccountage = get_useraccount_age(report_user)
+
 
     # reply to user
     userreport = "Author: /u/userleansbot\n"
@@ -227,8 +295,29 @@ def try_send_report(message, report_user, from_user):
     userreport += " ^(Bleep, bloop, I'm a bot trying to help inform political discussions on Reddit.) ^| [^About](https://www.reddit.com/user/userleansbot/comments/au1pva/faq_about_userleansbot/)\n "
     userreport += "___\n"
 
-    message.reply(userreport)
-    logger.info("+Sent")
+    try:
+        message.reply(userreport)
+        logger.info("+Sent")
+    except praw.exceptions.APIException as e:
+        logger.info("# [APIException]["+ e.error_type+"]: " + e.message)
+        if e.error_type== 'RATELIMIT':
+            logger.info("# [APIException][RATELIMIT]: " + str(r.auth.limits))
+            time.sleep(600)
+            return
+        if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
+            logger.info("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
+            return
+    except praw.exceptions.ClientException as e:
+        logger.info("# [ClientException]: " + str(e))
+        return
+    except prawcore.exceptions.Forbidden as e:
+        logger.info("# [BANNED]: " + str(e))
+        send_banned_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+        return
+    except Exception as e:
+        logger.info("# [UnknownError]: " + str(e))
+        time.sleep(15)
+        return
 
 
 def create_running_file():
