@@ -161,14 +161,6 @@ def process_pm(message):
 
     if pmcommand_match and pmcommand_match.group(1):
         try_send_report(message, pmcommand_match.group(1), message.author.name)
-        """
-        try:
-            try_send_report(message, pmcommand_match.group(1), message.author.name)
-        except  prawcore.exceptions.NotFound:
-            logger.error("# try_send_report PM fail - Requested user not found %s from %s" % (pmcommand_match.group(1), message.author.name))
-            send_user_pm(message.author.name, "Unknown User", "Sorry, this user does not exist: %s" % pmcommand_match.group(1))
-            return 
-        """
     else:
         try:
             logger.info("UNKNOWN COMMAND")
