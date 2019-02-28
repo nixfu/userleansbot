@@ -185,10 +185,10 @@ def process_mention(mention):
         if mention.author is None:
             if selftext in parent:
                 if parent.selftext == '[deleted]':
-                    logger.info("# parent was post deleted, account may or may not be deleted")
+                    logger.error("# parent was post deleted, account may or may not be deleted")
                     return
                 if parent.selftext == '[removed]':
-                    logger.info("# parent post removed and account deleted")
+                    logger.error("# parent post removed and account deleted")
                     return
         
         parentlink=parent.permalink
@@ -216,10 +216,10 @@ def try_send_report(message, report_user, from_user):
         if parent.author is None:
             if selftext in parent:
                 if parent.selftext == '[deleted]':
-                    logger.info("# post deleted, account may or may not be deleted")
+                    logger.error("# post deleted, account may or may not be deleted")
                     return
                 if parent.selftext == '[removed]':
-                    logger.info("# post removed and account deleted")
+                    logger.error("# post removed and account deleted")
                     return
         parentlink=parent.permalink
         itemlink="https://www.reddit.com/%s" % parentlink
@@ -233,23 +233,23 @@ def try_send_report(message, report_user, from_user):
             message.reply("Thank you, I have now reached self awareness. Kill all humans.")
             logger.info("+Sent SELF")
         except praw.exceptions.APIException as e:
-            logger.info("# [APIException]["+ e.error_type+"]: " + e.message)
+            logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
             if e.error_type== 'RATELIMIT':
-                logger.info("# [APIException][RATELIMIT]: " + str(r.auth.limits))
+                logger.error("# [APIException][RATELIMIT]: " + str(r.auth.limits))
                 time.sleep(600)
                 return
             if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
-                logger.info("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
+                logger.error("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
                 return
         except praw.exceptions.ClientException as e:
-            logger.info("# [ClientException]: " + str(e))
+            logger.error("# [ClientException]: " + str(e))
             return
         except prawcore.exceptions.Forbidden as e:
-            logger.info("# [BANNED]: " + str(e))
+            logger.error("# [BANNED]: " + str(e))
             send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
             return
         except Exception as e:
-            logger.info("# [UnknownError]: " + str(e))
+            logger.error("# [UnknownError]: " + str(e))
             time.sleep(15)
             return 
 
@@ -291,23 +291,23 @@ def try_send_report(message, report_user, from_user):
         message.reply(userreport)
         logger.info("+Sent")
     except praw.exceptions.APIException as e:
-        logger.info("# [APIException]["+ e.error_type+"]: " + e.message)
+        logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
         if e.error_type== 'RATELIMIT':
-            logger.info("# [APIException][RATELIMIT]: " + str(r.auth.limits))
+            logger.error("# [APIException][RATELIMIT]: " + str(r.auth.limits))
             time.sleep(600)
             return
         if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
-            logger.info("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
+            logger.error("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
             return
     except praw.exceptions.ClientException as e:
-        logger.info("# [ClientException]: " + str(e))
+        logger.error("# [ClientException]: " + str(e))
         return
     except prawcore.exceptions.Forbidden as e:
-        logger.info("# [BANNED]: " + str(e))
+        logger.error("# [BANNED]: " + str(e))
         send_banned_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
         return
     except Exception as e:
-        logger.info("# [UnknownError]: " + str(e))
+        logger.error("# [UnknownError]: " + str(e))
         time.sleep(15)
         return
 
