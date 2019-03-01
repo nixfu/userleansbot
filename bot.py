@@ -141,6 +141,7 @@ def check_mentions():
     """
     for message in reddit.inbox.unread(limit=None):
         # Mark Read first in case there is an error we don't want to keep trying to process it
+        message.mark_read()
         if message.was_comment:
             parent=message.parent()
             if parent.id in CACHE_REPLIES: 
@@ -149,7 +150,7 @@ def check_mentions():
         else:
             process_pm(message)
         # move to end
-        message.mark_read()
+        #message.mark_read()
 
 
 def process_pm(message):
@@ -235,7 +236,7 @@ def try_send_report(message, report_user, from_user):
         except praw.exceptions.APIException as e:
             logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
             if e.error_type== 'RATELIMIT':
-                logger.error("# [APIException][RATELIMIT]: " + str(r.auth.limits))
+                logger.error("# [APIException][RATELIMIT]: " + str(reddit.auth.limits))
                 time.sleep(600)
                 return
             if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
@@ -293,7 +294,7 @@ def try_send_report(message, report_user, from_user):
     except praw.exceptions.APIException as e:
         logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
         if e.error_type== 'RATELIMIT':
-            logger.error("# [APIException][RATELIMIT]: " + str(r.auth.limits))
+            logger.error("# [APIException][RATELIMIT]: " + str(reddit.auth.limits))
             time.sleep(600)
             return
         if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
@@ -343,13 +344,18 @@ def main():
         logger.debug("Start Main Loop")
         try:
             check_mentions()
-            logger.debug("End Main Loop")
+        except RequestException:
+            # Usually occurs when Reddit is not available. Non-fatal, but annoying.
+            logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
+            time.sleep(30)
         except Exception as err:
             logger.exception("Unknown Exception in Main Loop")
             try:
                 send_dev_pm("Unknown Exception in Main Loop", "Error: {exception}".format(exception=str(err)))
             except Exception as err:
                 logger.exception("Unknown error sending dev pm")
+
+        logger.debug("End Main Loop")
         time.sleep(10)
 
     logger.info("end")
