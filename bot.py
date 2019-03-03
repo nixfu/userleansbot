@@ -236,7 +236,7 @@ def try_send_report(message, report_user, from_user):
         except praw.exceptions.APIException as e:
             logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
             if e.error_type== 'RATELIMIT':
-                logger.error("# [APIException][RATELIMIT]: " + str(reddit.auth.limits))
+                logger.error("# [APIException][RATELIMIT]: time=%s %s" % (e.sleep_time, str(reddit.auth.limits)))
                 time.sleep(600)
                 return
             if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
@@ -294,7 +294,7 @@ def try_send_report(message, report_user, from_user):
     except praw.exceptions.APIException as e:
         logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
         if e.error_type== 'RATELIMIT':
-            logger.error("# [APIException][RATELIMIT]: " + str(reddit.auth.limits))
+            logger.error("# [APIException][RATELIMIT]: time=%s %s" % (e.sleep_time, str(reddit.auth.limits)))
             time.sleep(600)
             return
         if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
