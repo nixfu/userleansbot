@@ -8,6 +8,7 @@ import operator
 from operator import truediv
 import logging
 logger = logging.getLogger('bot')
+import random
 
 ## Functions to count total comments and comment karma for a user in particular
 ## subreddit
@@ -80,11 +81,9 @@ def get_user_summary(User_Karma, SortedSearchSubs):
         UserTotal += SubValue
         UserCount += SubCount
         
-
     if UserCount < 25:
         return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
     
-
     Sorted_SubTotals = {k: v for k, v in sorted(SubTotals.items(), key=lambda x: x[1])}
     Sorted_CatTotals = {k: v for k, v in sorted(CatTotals.items(), key=lambda x: x[1])}
 
@@ -118,26 +117,35 @@ def get_user_summary(User_Karma, SortedSearchSubs):
     if TopCat_pct > 10:
         usersummary = "%s (%2.2f%%) %s" % (leansword, TopCat_pct, TopCat)
     else:
-        return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
+        return "This user has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
+
+    communism_words= [ ', and is possibly a communist', ', and seems to be a communist, be sure to call them comrade', ', and is likely a communist', ', and probably thinks that real communism has not been tried yet', ', and is secretly plotting the communist revolution from their moms basement' , ', and is probably a communist who wears nothing but plain brown pants and shorts' ]
+    socialism_words=[ ', and is probably a socialist', ', and might be a socialist, with a Bernie2020 bumper stick on their Prius', ', and is likely a socialist who does not understand why we can\'t all just not work and be happy' ]
+    donald_words=   [ ', and most likely has a closet full of MAGA hats' , ', and is a graduate of Trump University' ]
+    anarchy_words=  [ ', and they attend antifa protests whenever theyir mom will give them a ride', ', and they keep their protest gear in their moms minivan' ]
+    conservative_words= [ ', and when you agree with them, say mega dittos', ', and is arguing with you while having one hand tied behind their back just to make it fair', ', and they beieve their talent is on loan from god' ]
+    liberal_words = [ ', and they are also a /politics fan, so they probably have MSNBC on in the room right now', ', and they believe that AOC is the greatest thinker in more than 100 years', ', and still has Hillary2016 on their Prius' ]
+    libertarian_words = [ ', and believes gay married couples should be able to protect ther Marijuana plants with fully automatic weapons', ', and wants to take over the world so they can leave you the hell alone', '' , '', '']
+
 
     if "communis" in TopSub.lower() or "communis" in SecondSub.lower():
-        #withword=" and is probably a communist who calls everyone comrade"
-        withword=", and is possibly a communist"
+        withword=random.choice(communism_words)
     elif "chapo" in TopSub.lower() or "chapo" in SecondSub.lower():
-        withword=", and is likely a communist"
+        withword=random.choice(communism_words)
     elif "socialism" in TopSub.lower() or "socialism" in SecondSub.lower():
-        withword=", and might be a socialist, with a Bernie2020 bumper sticker on their Prius"
+        withword=random.choice(socialism_words)
     elif "the_donald" in TopSub.lower() or "the_donald" in SecondSub.lower():
-        withword=", and most likely has a closet full of MAGA hats"
+        withword=random.choice(donald_words)
     elif "anarchis" in TopSub.lower() or "anarchis" in SecondSub.lower():
-        withword=", and is possibly a communist"
-        #withword=" and they keep their anfifa protest gear in their moms basement"
+        withword=random.choice(communism_words)
     elif "anarchy" in TopSub.lower() or "anarchy" in SecondSub.lower():
-        withword=", and they try to attend antifa protests whenever their mom will give them a ride"
+        withword=random.choice(anarchy_words)
     elif "conservative" in TopSub.lower() or "conservative" in SecondSub.lower():
-        withword=", and when you agree with them, say mega dittos with one hand tied behind your back just to make it fair"
+        withword=random.choice(conservative_words)
     elif "politics" in TopSub.lower() or "politics" in SecondSub.lower():
-        withword=", and they are also a /politics fan, so they probably have MSNBC on in the room now"
+        withword=random.choice(liberal_words)
+    elif TopCat_pct > 75 and TopCat == 'libertarian':
+        withword=random.choice(libertarian_words)
     else:
         withword=""
 
