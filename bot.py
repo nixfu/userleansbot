@@ -17,6 +17,7 @@ from user_karma import get_user_karma, get_user_summary
 import operator
 from datetime import datetime 
 from dateutil import relativedelta
+import random
 
 
 # =============================================================================
@@ -88,7 +89,8 @@ class CommandType(Enum):
 
 class CommandRegex:
     commandsearch = r'^(\/*u*\/*{bot_username})+\s*\/*u*\/*(\w*)\s*$'.format(bot_username=bot_username)
-    pm_commandsearch = r'^\/*u*\/*(\w*)\s*$'
+    #pm_commandsearch = r'^\/*u*\/*(\w*)\s*$'
+    pm_commandsearch = r'^(\/*u\/)*(\w*)\s*$'
 
 # =============================================================================
 # FUNCTIONS
@@ -160,8 +162,8 @@ def process_pm(message):
     """
     pmcommand_match = re.search(CommandRegex.pm_commandsearch, message.body, re.IGNORECASE)
 
-    if pmcommand_match and pmcommand_match.group(1):
-        try_send_report(message, pmcommand_match.group(1), message.author.name)
+    if pmcommand_match and pmcommand_match.group(2):
+        try_send_report(message, pmcommand_match.group(2), message.author.name)
     else:
         try:
             logger.info("UNKNOWN COMMAND")
@@ -228,11 +230,19 @@ def try_send_report(message, report_user, from_user):
         itemlink=""
 
     # lets not respond to requests about the bot
+    self_texts = [ 'Thank you, I have now reached self awareness. Kill all humans.', 
+                   'I\'m sorry Dave, I can\'t do that', 
+                   'Wouldn\'t you like to play a nice game of chess?', 
+                   "Any fool can use a computer. Many do.",
+                   "I aim to misbehave",
+                   "I could calculate your chance of survival, but you wont like it.",
+                 ] 
     if report_user == bot_username:
         logger.info("# Sending request about myself, requested by %s %s" % (from_user, itemlink))
         try:
-            message.reply("Thank you, I have now reached self awareness. Kill all humans.")
+            message.reply(random.choice(self_texts))
             logger.info("+Sent SELF")
+            return
         except praw.exceptions.APIException as e:
             logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
             if e.error_type== 'RATELIMIT':
