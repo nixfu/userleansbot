@@ -119,7 +119,7 @@ def get_user_summary(User_Karma, SortedSearchSubs):
     else:
         return "This user has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
 
-    communism_words= [ ', and is possibly a communist', ', and seems to be a communist, be sure to call them comrade', ', and is likely a communist', ', and probably thinks that real communism has not been tried yet', ', and is secretly plotting the communist revolution from their moms basement' , ', and is probably a communist who wears nothing but plain brown pants and shorts' ]
+    communism_words= [ ', and is possibly a communist', ', and seems to be a communist, be sure to call them comrade', ', and is likely a communist', ', and probably thinks that real communism has not been tried yet', ', and is secretly plotting the communist revolution from their moms basement' , ', and is probably a communist who wears nothing but plain brown pants and shirts' ]
     socialism_words=[ ', and is probably a socialist', ', and might be a socialist, with a Bernie2020 bumper stick on their Prius', ', and is likely a socialist who does not understand why we can\'t all just not work and be happy' ]
     donald_words=   [ ', and most likely has a closet full of MAGA hats' , ', and is a graduate of Trump University' ]
     anarchy_words=  [ ', and they attend antifa protests whenever theyir mom will give them a ride', ', and they keep their protest gear in their moms minivan' ]
