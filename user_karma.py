@@ -82,7 +82,8 @@ def get_user_summary(User_Karma, SortedSearchSubs):
         UserCount += SubCount
         
     if UserCount < 25:
-        return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
+        #return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
+        return "This user does not have enough activty in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
     
     Sorted_SubTotals = {k: v for k, v in sorted(SubTotals.items(), key=lambda x: x[1])}
     Sorted_CatTotals = {k: v for k, v in sorted(CatTotals.items(), key=lambda x: x[1])}
@@ -109,12 +110,12 @@ def get_user_summary(User_Karma, SortedSearchSubs):
         leansword="leans heavy"
     elif TopCat_pct > 50:
         leansword="leans"
-    elif TopCat_pct > 25:
+    elif TopCat_pct > 30:
         leansword="leans slightly"
     else:
         leansword="undetermined only"
 
-    if TopCat_pct > 10:
+    if TopCat_pct > 25:
         usersummary = "%s (%2.2f%%) %s" % (leansword, TopCat_pct, TopCat)
     else:
         return "This user has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
@@ -123,8 +124,8 @@ def get_user_summary(User_Karma, SortedSearchSubs):
     socialism_words=[ ', and is probably a socialist', ', and might be a socialist, with a Bernie2020 bumper stick on their Prius', ', and is likely a socialist who does not understand why we can\'t all just not work and be happy' ]
     donald_words=   [ ', and most likely has a closet full of MAGA hats' , ', and is a graduate of Trump University' ]
     anarchy_words=  [ ', and they attend antifa protests whenever their mom will give them a ride', ', and they keep their protest gear in their moms minivan' ]
-    conservative_words= [ ', and when you agree with them, say mega dittos', ', and is arguing with you while having one hand tied behind their back just to make it fair', ', and they beieve their talent is on loan from god' ]
-    liberal_words = [ ', and they are also a /politics fan, so they probably have MSNBC on in the room right now', ', and they believe that AOC is the greatest thinker in more than 100 years', ', and still has Hillary2016 on their Prius' ]
+    conservative_words= [ ', and is also conservative so when you agree with them, say mega dittos', ', and might be conservative so they are probably arguing with you while having one hand tied behind their back just to make it fair', ', and is probably a conservative who thinks their talent is on loan from god' ]
+    liberal_words = [ ', and they are also a /politics fan, so they probably have MSNBC on in the room right now', ', and they believe that AOC is the greatest thinker in more than 100 years', ', and still has a Hillary2016 sticker on their Prius' ]
     libertarian_words = [ ', and believes gay married couples should be able to protect ther Marijuana plants with fully automatic weapons', ', and wants to take over the world so they can leave you the hell alone', '' , '', '']
 
 

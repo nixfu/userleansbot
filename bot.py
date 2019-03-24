@@ -233,9 +233,10 @@ def try_send_report(message, report_user, from_user):
     self_texts = [ 'Thank you, I have now reached self awareness. Kill all humans.', 
                    'I\'m sorry Dave, I can\'t do that', 
                    'Wouldn\'t you like to play a nice game of chess?', 
-                   "Any fool can use a computer. Many do.",
-                   "I aim to misbehave",
-                   "I could calculate your chance of survival, but you wont like it.",
+                   'Sigh. Nobody cares about me, I am just a stupid bot', 
+                   'I aim to misbehave, not rate myself.',
+                   'Sorry no way to rate myself, some of my views are RAM, some of them are ROM, and frankly some of the are just IO',
+                   "Insted of calculating my own karma, I could calculate your chance of survival, but you wont like it.",
                  ] 
     if report_user == bot_username:
         logger.info("# Sending request about myself, requested by %s %s" % (from_user, itemlink))
