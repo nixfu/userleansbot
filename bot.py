@@ -292,7 +292,8 @@ def try_send_report(message, report_user, from_user):
     for sreddit, stype in SortedSearchSubs:
         if sreddit in User_Karma: 
             if User_Karma[sreddit]['c_count'] > 0 or User_Karma[sreddit]['s_count'] > 0:
-                userreport += "/r/%s|%s|%s|%s|%s|%s\n" % (sreddit, stype, User_Karma[sreddit]['c_count'], User_Karma[sreddit]['c_karma'], User_Karma[sreddit]['s_count'], User_Karma[sreddit]['s_karma'])
+                sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
+                userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Karma[sreddit]['c_count'], User_Karma[sreddit]['c_karma'], User_Karma[sreddit]['s_count'], User_Karma[sreddit]['s_karma'])
     userreport += "\n"
 
     userreport += "***\n"
