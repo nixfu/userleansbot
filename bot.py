@@ -88,9 +88,9 @@ class CommandType(Enum):
     UNKNOWN = 3
 
 class CommandRegex:
-    commandsearch = r'^(\/*u*\/*{bot_username})+\s*\/*u*\/*(\w*)\s*$'.format(bot_username=bot_username)
+    commandsearch = r'^(\/*u*\/*{bot_username})+\s*\/*u*\/*([-\w]*)\s*$'.format(bot_username=bot_username)
     #pm_commandsearch = r'^\/*u*\/*(\w*)\s*$'
-    pm_commandsearch = r'^(\/*u\/)*(\w*)\s*$'
+    pm_commandsearch = r'^(\/*u\/)*([-\w]*)\s*$'
 
 # =============================================================================
 # FUNCTIONS
