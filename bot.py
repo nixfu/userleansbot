@@ -166,7 +166,7 @@ def process_pm(message):
         try_send_report(message, pmcommand_match.group(2), message.author.name)
     else:
         try:
-            logger.info("UNKNOWN COMMAND")
+            logger.info("UNKNOWN COMMAND: %s" % message.body)
         except praw.exceptions.APIException as e:
             if e.error_type == 'DELETED_COMMENT' in str(e):
                 print("Comment " + comment.id + " was deleted")
@@ -274,7 +274,7 @@ def try_send_report(message, report_user, from_user):
         send_user_pm(from_user, "Unknown User", "Sorry, this user does not exist: %s" % report_user)
         return 
 
-    User_Karma = get_user_karma(report_user, Search_Sub_List)
+    User_Karma = get_user_karma(reddit, report_user, Search_Sub_List)
     usersummary = get_user_summary(User_Karma,SortedSearchSubs)
 
 

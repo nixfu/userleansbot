@@ -12,23 +12,56 @@ import random
 
 ## Functions to count total comments and comment karma for a user in particular
 ## subreddit
+def get_user_karma(reddit,Search_User,Search_Subs_List):
+    User_Karma = {}
+    User_Karma = get_user_karma_reddit(reddit,Search_User,Search_Subs_List)
+    #User_Karma = get_user_karma_pushshift(reddit,Search_User,Search_Subs_List)
+    return User_Karma
 
+def get_user_karma_reddit(reddit,Search_User,Search_Subs_List):
+    User_Karma = {}
+    c_count = 0
+    for comment in reddit.redditor(Search_User).comments.new(limit=1000):
+        commentsub=comment.subreddit.display_name.lower()
+        if commentsub in Search_Subs_List:
+            if commentsub not in User_Karma:
+                User_Karma[commentsub] = {}
+                User_Karma[commentsub]['c_karma'] = 0
+                User_Karma[commentsub]['c_count'] = 0
+                User_Karma[commentsub]['s_karma'] = 0
+                User_Karma[commentsub]['s_count'] = 0
+            User_Karma[commentsub]['c_karma'] += comment.score
+            User_Karma[commentsub]['c_count'] += 1
 
-def get_author_comments(**kwargs):
+    s_count = 0
+    for submit in reddit.redditor(Search_User).submissions.new(limit=1000):
+            submitsub=submit.subreddit.display_name.lower()
+            if submitsub in Search_Subs_List:
+                if submitsub not in User_Karma:
+                    User_Karma[submitsub] = {}
+                    User_Karma[submitsub]['c_karma'] = 0
+                    User_Karma[submitsub]['c_count'] = 0
+                    User_Karma[submitsub]['s_karma'] = 0
+                    User_Karma[submitsub]['s_count'] = 0
+                User_Karma[submitsub]['s_karma'] += submit.score
+                User_Karma[submitsub]['s_count'] += 1
+    return User_Karma
+
+def get_author_comments_pushshift(**kwargs):
     r = requests.get("https://api.pushshift.io/reddit/comment/search/",params=kwargs)
     data = r.json()
     return data['data']
 
-def get_author_submissions(**swargs):
+def get_author_submissions_pushshift(**swargs):
     r = requests.get("https://api.pushshift.io/reddit/submission/search/",params=swargs)
     data = r.json()
     return data['data']
 
-def get_user_karma(Search_User,Search_Subs_List):
+def get_user_karma_pushshift(reddit, Search_User,Search_Subs_List):
     User_Karma = {}
 
     c_count = 0
-    comments = get_author_comments(author=Search_User,size=1000,sort='desc',sort_type='created_utc')
+    comments = get_author_comments_pushshift(author=Search_User,size=1000,sort='desc',sort_type='created_utc')
     for comment in comments:
         commentsub=comment['subreddit'].lower()
         if commentsub in Search_Subs_List:
@@ -42,7 +75,7 @@ def get_user_karma(Search_User,Search_Subs_List):
             User_Karma[commentsub]['c_count'] += 1
 
     s_count = 0
-    submissions = get_author_submissions(author=Search_User,size=1000,sort='desc',sort_type='created_utc')
+    submissions = get_author_submissions_pushshift(author=Search_User,size=1000,sort='desc',sort_type='created_utc')
     for submit in submissions:
         if 'subreddit' in submit:
             submitsub=submit['subreddit'].lower()
@@ -74,7 +107,9 @@ def get_user_summary(User_Karma, SortedSearchSubs):
 
         SubKarma = User_Karma[sreddit]['c_karma'] + User_Karma[sreddit]['s_karma']
         SubCount = User_Karma[sreddit]['c_count'] + User_Karma[sreddit]['s_count']
-        SubValue = SubKarma + SubCount
+
+        # counts weight 10x > karma
+        SubValue = SubKarma + (SubCount * 10)
 
         CatTotals[stype] += SubValue
         SubTotals[sreddit] += SubValue

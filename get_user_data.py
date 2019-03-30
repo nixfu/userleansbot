@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3 -u
 
 import re
 import logging
@@ -10,6 +10,8 @@ import praw
 from user_karma import get_user_karma, get_user_summary
 import operator
 from bot import get_useraccount_age
+import configparser
+
 
 
 # Reads the config file
@@ -44,7 +46,7 @@ print ("Checking User=%s" % user)
 
 # TEST FUNCTION
 User_Karma = {}
-User_Karma = get_user_karma(user,Search_Sub_List)
+User_Karma = get_user_karma(reddit,user,Search_Sub_List)
 
 usersummary = get_user_summary(User_Karma, SortedSearchSubs)
 useraccountage = get_useraccount_age(user)
