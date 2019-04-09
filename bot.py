@@ -238,6 +238,7 @@ def try_send_report(message, report_user, from_user):
                    'Sorry no way to rate myself, some of my views are RAM, some of them are ROM, and frankly some of the are just IO',
                    "Insted of calculating my own karma, I could calculate your chance of survival, but you wont like it.",
                    "Number 5... is alive!  Malfunction! Need input!  No disassemble!",
+                   "Man walks into a bar where there is a robot bartender. Robot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"160\". Robot talks to man about space exploration, quantum mechanics, and advancements in medical technology. Man leaves bar and thinks, \"wow! that was really interesting, think I will go back in.\" Man returns to bar.\n\nRobot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"100\". Robot talks to man about the NFL, basketball and NASCAR. Man leaves bar and thinks, \"that is unbelievable, think I will try that one more time.\" Man returns to bar.\n\n Robot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"60\". Robot leans over and says, \"so , you voted for Hillary?\"\n\n---\n*Feel free to steal my joke and replace with YOUR least favorite politican.*"
                  ] 
     if report_user == bot_username:
         logger.info("# Sending request about myself, requested by %s %s" % (from_user, itemlink))
