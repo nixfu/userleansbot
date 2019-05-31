@@ -9,6 +9,7 @@ alias leanstatus="ps -ef|grep bot.py |grep -v grep"
 BOTDIR="/home/redditbot/github/bots/userleansbot"
 cd $BOTDIR
 
+export TZ=EST5EDT
 
 if ! ps -ef |grep -v grep | grep -q "python3 -u userleans.py"; then
 	#tmux new-session -d -s userleansbot 'python3 bot.py'
