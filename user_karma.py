@@ -118,7 +118,7 @@ def get_user_summary(User_Karma, SortedSearchSubs):
         
     if UserCount < 25:
         #return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
-        return "This user does not have enough activty in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
+        return "This user does not have enough activity in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
     
     Sorted_SubTotals = {k: v for k, v in sorted(SubTotals.items(), key=lambda x: x[1])}
     Sorted_CatTotals = {k: v for k, v in sorted(CatTotals.items(), key=lambda x: x[1])}

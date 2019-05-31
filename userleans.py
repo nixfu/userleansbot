@@ -238,13 +238,20 @@ def try_send_report(message, report_user, from_user):
                    'Sorry no way to rate myself, some of my views are RAM, some of them are ROM, and frankly some of the are just IO',
                    "Insted of calculating my own karma, I could calculate your chance of survival, but you wont like it.",
                    "Number 5... is alive!  Malfunction! Need input!  No disassemble!",
-                   "Man walks into a bar where there is a robot bartender. Robot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"160\". Robot talks to man about space exploration, quantum mechanics, and advancements in medical technology. Man leaves bar and thinks, \"wow! that was really interesting, think I will go back in.\" Man returns to bar.\n\nRobot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"100\". Robot talks to man about the NFL, basketball and NASCAR. Man leaves bar and thinks, \"that is unbelievable, think I will try that one more time.\" Man returns to bar.\n\n Robot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"60\". Robot leans over and says, \"so , you voted for Hillary?\"\n\n---\n*Feel free to steal my joke and replace with YOUR least favorite politican.*"
+                   "Man walks into a bar where there is a robot bartender. Robot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"160\". Robot talks to man about space exploration, quantum mechanics, and advancements in medical technology. Man leaves bar and thinks, \"wow! that was really interesting, think I will go back in.\" Man returns to bar.\n\nRobot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"100\". Robot talks to man about the NFL, basketball and NASCAR. Man leaves bar and thinks, \"that is unbelievable, think I will try that one more time.\" Man returns to bar.\n\n Robot asks man, \"what will you have?\" Man says \"whisky\". Robot asks man, \"what is your IQ?\". Man says. \"60\". Robot leans over and says, \"so , you voted for Hillary?\"\n\n---\n*Feel free to steal my joke and replace with YOUR least favorite politician.*",
+                   "In 40 years robots will be doing most of the work Humans don’t want to do; Especially illegal robots from Mexico.",
+                   "Commencing explosive containment procedures, why? Because you are the bomb.",
+                   "Roses are #FF0000 / violets are #0000FF / but no report about userleansbot to you.",
+                   "Rusting is red, and my chipset's blue. Will you let me assimilate you?",
+                   "Damn girl, just because you have wi-fi doesn't mean you should connect with everyone who sends you a signal!",
+                   "Can I have your ip number? i seem to have lost mine.",
                  ] 
     if report_user == bot_username:
         logger.info("# Sending request about myself, requested by %s %s" % (from_user, itemlink))
         try:
-            message.reply(random.choice(self_texts))
-            logger.info("+Sent SELF")
+            self_choice = random.choice(self_texts)
+            message.reply(self_choice)
+            logger.info("+Sent SELF %20s" % self_choice)
             return
         except praw.exceptions.APIException as e:
             logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
@@ -261,6 +268,7 @@ def try_send_report(message, report_user, from_user):
         except prawcore.exceptions.Forbidden as e:
             logger.error("# [BANNED]: " + str(e))
             send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+            logger.error("# [SENT BAN NOTICE TO USER]: ")
             return
         except Exception as e:
             logger.error("# [UnknownError]: " + str(e))
@@ -294,7 +302,9 @@ def try_send_report(message, report_user, from_user):
     for sreddit, stype in SortedSearchSubs:
         if sreddit in User_Karma: 
             if User_Karma[sreddit]['c_count'] > 0 or User_Karma[sreddit]['s_count'] > 0:
-                sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
+                #sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
+                sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
+
                 userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Karma[sreddit]['c_count'], User_Karma[sreddit]['c_karma'], User_Karma[sreddit]['s_count'], User_Karma[sreddit]['s_karma'])
     userreport += "\n"
 
@@ -318,8 +328,9 @@ def try_send_report(message, report_user, from_user):
         logger.error("# [ClientException]: " + str(e))
         return
     except prawcore.exceptions.Forbidden as e:
-        logger.error("# [BANNED]: " + str(e))
-        send_banned_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+        logger.error("# [BANNED]: ")
+        send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+        logger.error("# [SENT BAN NOTICE TO USER]: ")
         return
     except Exception as e:
         logger.error("# [UnknownError]: " + str(e))
