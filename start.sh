@@ -14,7 +14,7 @@ if ! ps -ef |grep -v grep | grep -q "python3 -u userleans.py"; then
 	#tmux new-session -d -s userleansbot 'python3 bot.py'
     	/usr/bin/screen -dmS userleans python3 -u userleans.py
 else
-	#echo "Bot running" >> ${BOTDIR}/cron.log
+	#echo "Bot running"
 	exit 0
 fi
 
