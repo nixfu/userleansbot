@@ -11,11 +11,13 @@ cd $BOTDIR
 
 export TZ=EST5EDT
 
-if ! ps -ef |grep -v grep | grep -q "python3 -u userleans.py"; then
+BOTPID=$(cat ${BOTDIR}/bot.pid)
+
+if ! ps -ef |awk '{print $2}' |grep -q ${BOTPID}; then
 	#tmux new-session -d -s userleansbot 'python3 bot.py'
     	/usr/bin/screen -dmS userleans python3 -u userleans.py
 else
-	#echo "Bot running"
+	echo "Bot running: pid=${BOTPID}"
 	exit 0
 fi
 
