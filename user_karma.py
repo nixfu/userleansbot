@@ -109,14 +109,16 @@ def get_user_summary(User_Karma, SortedSearchSubs):
         SubCount = User_Karma[sreddit]['c_count'] + User_Karma[sreddit]['s_count']
 
         # counts weight 10x > karma
-        SubValue = SubKarma + (SubCount * 10)
-
-        CatTotals[stype] += SubValue
+        SubValue = SubKarma
         SubTotals[sreddit] += SubValue
-        UserTotal += SubValue
+
+        if SubValue > 0:
+            CatTotals[stype] += SubValue
+            UserTotal += SubValue
+
         UserCount += SubCount
         
-    if UserCount < 25:
+    if UserCount < 10:
         #return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
         return "This user does not have enough activity in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
     
@@ -132,14 +134,19 @@ def get_user_summary(User_Karma, SortedSearchSubs):
 
     if len(list(Sorted_SubTotals.keys())) >= 1:
         TopSub = list(Sorted_SubTotals.keys())[-1]
+        if SubTotals[TopSub] < 0:
+            TopSub = ""
     else:
         TopSub = ""
 
     if len(list(Sorted_SubTotals.keys())) >= 2:
         SecondSub = list(Sorted_SubTotals.keys())[-2]
+        if SubTotals[SecondSub] < 0:
+            SecondSub = ""
     else:
         SecondSub= ""
 
+    print("Top Cat: %s pct=%s TopSub: %s" % (TopCat, TopCat_pct, TopSub))
 
     if TopCat_pct > 75:
         leansword="leans heavy"
@@ -162,7 +169,6 @@ def get_user_summary(User_Karma, SortedSearchSubs):
     conservative_words= [ ', and is likely also conservative so when you agree with them, say mega dittos', ', and might be conservative so they are probably arguing with you while having one hand tied behind their back just to make it fair', ', and is probably a conservative who thinks their talent is on loan from god' ]
     liberal_words = [ ', and they are also a /politics fan, so they probably have MSNBC on in the room right now', ', and they might believe that AOC is the greatest thinker in more than 100 years', ', and still has a Hillary2016 sticker on their Prius' ]
     libertarian_words = [ ', and believes gay married couples should be able to protect ther Marijuana plants with fully automatic weapons', ', and wants to take over the world so they can leave you the hell alone', '' , '', '']
-
 
     if "communis" in TopSub.lower() or "communis" in SecondSub.lower():
         withword=random.choice(communism_words)

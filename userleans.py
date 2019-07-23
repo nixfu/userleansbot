@@ -226,8 +226,10 @@ def try_send_report(message, report_user, from_user):
                     return
         parentlink=parent.permalink
         itemlink="https://www.reddit.com/%s" % parentlink
+        itemsub=parent.subreddit
     else:
         itemlink=""
+        itemsub=""
 
     # lets not respond to requests about the bot
     self_texts = [ 'Thank you, I have now reached self awareness. Kill all humans.', 
@@ -266,7 +268,7 @@ def try_send_report(message, report_user, from_user):
             logger.error("# [ClientException]: " + str(e))
             return
         except prawcore.exceptions.Forbidden as e:
-            logger.error("# [BANNED]: " + str(e))
+            logger.error("# [BANNED]: %s - %s" % (itemsub,str(e)))
             send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
             logger.error("# [SENT BAN NOTICE TO USER]: ")
             return
@@ -328,7 +330,7 @@ def try_send_report(message, report_user, from_user):
         logger.error("# [ClientException]: " + str(e))
         return
     except prawcore.exceptions.Forbidden as e:
-        logger.error("# [BANNED]: ")
+        logger.error("# [BANNED]:  %s" % itemsub)
         send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
         logger.error("# [SENT BAN NOTICE TO USER]: ")
         return

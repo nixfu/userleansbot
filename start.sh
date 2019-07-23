@@ -1,12 +1,12 @@
 #!/bin/bash
 export EDITOR=vi
 export PIP_USER=yes
-export PATH=/home/redditbot/.local/bin:$PATH
+export PATH=/home/myredditbot/.local/bin:$PATH
 alias startlean="cd ~/github/bots/userleansbot;/usr/bin/screen -dmS userleans python3 userleans.py"
 alias leanlog="tail -f ~/github/bots/userleansbot/bot.log"
 alias leanstatus="ps -ef|grep bot.py |grep -v grep"
 
-BOTDIR="/home/redditbot/github/bots/userleansbot"
+BOTDIR="/home/myredditbot/github/bots/userleansbot"
 cd $BOTDIR
 
 export TZ=EST5EDT
