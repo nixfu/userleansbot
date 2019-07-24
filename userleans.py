@@ -55,12 +55,14 @@ LOG_LEVEL = logging.INFO
 #LOG_LEVEL = logging.DEBUG
 LOG_FILENAME = "bot.log"
 LOG_FILE_BACKUPCOUNT = 5
-LOG_FILE_MAXSIZE = 1024 * 256
+LOG_FILE_MAXSIZE = 20000 * 256
 FORMAT = '%(levelname)-8s:%(asctime)s - %(message)s'
 
 logger = logging.getLogger('bot')
 logger.setLevel(LOG_LEVEL)
-log_formatter = logging.Formatter('%(levelname)-8s:%(asctime)s - %(message)s')
+#log_formatter = logging.Formatter('%(levelname)-8s:%(asctime)s - %(message)s')
+log_formatter = logging.Formatter('%(levelname)-8s:%(asctime)s:%(lineno)4d - %(message)s')
+#log_formatter = logging.Formatter( '%(levelname)-8s:%(lineno)4d-%(asctime)s - %(message)s')
 log_stderrHandler = logging.StreamHandler()
 log_stderrHandler.setFormatter(log_formatter)
 logger.addHandler(log_stderrHandler)
@@ -166,7 +168,7 @@ def process_pm(message):
         try_send_report(message, pmcommand_match.group(2), message.author.name)
     else:
         try:
-            logger.info("UNKNOWN COMMAND: %s" % message.body)
+            logger.error("# Recieved UNKNOWN COMMAND: %s" % message.body)
         except praw.exceptions.APIException as e:
             if e.error_type == 'DELETED_COMMENT' in str(e):
                 print("Comment " + comment.id + " was deleted")
@@ -253,7 +255,7 @@ def try_send_report(message, report_user, from_user):
         try:
             self_choice = random.choice(self_texts)
             message.reply(self_choice)
-            logger.info("+Sent SELF %20s" % self_choice)
+            logger.debug("+Sent SELF %20s" % self_choice)
             return
         except praw.exceptions.APIException as e:
             logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
@@ -268,9 +270,9 @@ def try_send_report(message, report_user, from_user):
             logger.error("# [ClientException]: " + str(e))
             return
         except prawcore.exceptions.Forbidden as e:
-            logger.error("# [BANNED]: %s - %s" % (itemsub,str(e)))
+            logger.info("# [BANNED from sub]: %s - %s" % (itemsub,str(e)))
             send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
-            logger.error("# [SENT BAN NOTICE TO USER]: ")
+            logger.info("# [SENT PM notice to user that I am banned]")
             return
         except Exception as e:
             logger.error("# [UnknownError]: " + str(e))
@@ -330,9 +332,9 @@ def try_send_report(message, report_user, from_user):
         logger.error("# [ClientException]: " + str(e))
         return
     except prawcore.exceptions.Forbidden as e:
-        logger.error("# [BANNED]:  %s" % itemsub)
+        logger.error("# [BANNED from sub]:  %s" % itemsub)
         send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
-        logger.error("# [SENT BAN NOTICE TO USER]: ")
+        logger.error("# [SENT PM notice to user that I am banned]")
         return
     except Exception as e:
         logger.error("# [UnknownError]: " + str(e))
