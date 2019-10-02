@@ -10,10 +10,12 @@ import logging.handlers
 import time
 import os
 import sys
+sys.path.append('../userdata')
 from enum import Enum
 import praw
 import prawcore
-from user_karma import get_user_karma, get_user_summary
+from RedditUserData import get_User_Data
+from user_karma import get_user_summary
 import operator
 from datetime import datetime 
 from dateutil import relativedelta
@@ -51,11 +53,12 @@ DEV_USER_NAME = config.get("BOT", "dev_user")
 
 RUNNING_FILE = "bot.pid"
 
-LOG_LEVEL = logging.INFO
-#LOG_LEVEL = logging.DEBUG
+#LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.DEBUG
 LOG_FILENAME = "bot.log"
 LOG_FILE_BACKUPCOUNT = 5
-LOG_FILE_MAXSIZE = 20000 * 256
+LOG_FILE_INTERVAL = 2
+LOG_FILE_MAXSIZE = 5000 * 256
 FORMAT = '%(levelname)-8s:%(asctime)s - %(message)s'
 
 logger = logging.getLogger('bot')
@@ -67,7 +70,8 @@ log_stderrHandler = logging.StreamHandler()
 log_stderrHandler.setFormatter(log_formatter)
 logger.addHandler(log_stderrHandler)
 if LOG_FILENAME:
-        log_fileHandler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=LOG_FILE_MAXSIZE, backupCount=LOG_FILE_BACKUPCOUNT)
+        #log_fileHandler = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=LOG_FILE_MAXSIZE, backupCount=LOG_FILE_BACKUPCOUNT)
+        log_fileHandler = logging.handlers.TimedRotatingFileHandler(LOG_FILENAME, when='d', interval=LOG_FILE_INTERVAL, backupCount=LOG_FILE_BACKUPCOUNT)
         log_fileHandler.setFormatter(log_formatter)
         logger.addHandler(log_fileHandler)
 
@@ -288,7 +292,7 @@ def try_send_report(message, report_user, from_user):
         send_user_pm(from_user, "Unknown User", "Sorry, this user does not exist: %s" % report_user)
         return 
 
-    User_Karma = get_user_karma(reddit, report_user, Search_Sub_List)
+    User_Karma = get_User_Data(reddit, report_user, Search_Sub_List)
     usersummary = get_user_summary(User_Karma,SortedSearchSubs)
 
 
@@ -385,7 +389,7 @@ def main():
                 logger.exception("Unknown error sending dev pm")
 
         logger.debug("End Main Loop")
-        time.sleep(10)
+        time.sleep(30)
 
     logger.info("end")
 
