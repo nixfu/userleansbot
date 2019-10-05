@@ -15,7 +15,7 @@ from enum import Enum
 import praw
 import prawcore
 from RedditUserData import get_User_Data
-from user_karma import get_user_summary
+from user_summary import get_user_summary
 import operator
 from datetime import datetime 
 from dateutil import relativedelta
@@ -45,7 +45,7 @@ Search_Sub_List = list(config['SearchSubs'].keys())
 reddit = praw.Reddit(client_id=client_id,
                      client_secret=client_secret,
                      password=bot_password,
-                     user_agent='User Leans Bot by /u/nixfu',
+                     user_agent='UserLeansBot by /u/nixfu',
                      username=bot_username)
 
 ENVIRONMENT = config.get("BOT", "environment")
@@ -292,8 +292,8 @@ def try_send_report(message, report_user, from_user):
         send_user_pm(from_user, "Unknown User", "Sorry, this user does not exist: %s" % report_user)
         return 
 
-    User_Karma = get_User_Data(reddit, report_user, Search_Sub_List)
-    usersummary = get_user_summary(User_Karma,SortedSearchSubs)
+    User_Data = get_User_Data(reddit, report_user, Search_Sub_List)
+    usersummary = get_user_summary(User_Data,SortedSearchSubs)
 
 
     # reply to user
@@ -305,15 +305,15 @@ def try_send_report(message, report_user, from_user):
     userreport += "\n"
     userreport += "Summary: **%s**\n" % (usersummary)
     userreport += "\n"
-    userreport += " Subreddit|Lean|No. of comments|Total comment karma|No. of posts|Total post karma\n"
-    userreport += " :--|:--|:--|:--|:--|:--|:--|:--\n"
+    userreport += " Subreddit|Lean|No. of comments|Total comment karma|Median words per comment|No. of posts|Total post karma|Top 3 words used|\n"
+    userreport += " :--|:--|:--|:--|:--|:--|:--|:--|:--|:--\n"
     for sreddit, stype in SortedSearchSubs:
-        if sreddit in User_Karma: 
-            if User_Karma[sreddit]['c_count'] > 0 or User_Karma[sreddit]['s_count'] > 0:
+        if sreddit in User_Data: 
+            if User_Data[sreddit]['c_count'] > 0 or User_Data[sreddit]['s_count'] > 0:
                 #sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
                 sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
 
-                userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Karma[sreddit]['c_count'], User_Karma[sreddit]['c_karma'], User_Karma[sreddit]['s_count'], User_Karma[sreddit]['s_karma'])
+                userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Data[sreddit]['c_count'], User_Data[sreddit]['c_karma'], User_Data[sreddit]['c_median_length'],User_Data[sreddit]['s_count'], User_Data[sreddit]['s_karma'], User_Data[sreddit]['top_words'])
     userreport += "\n"
 
     userreport += "***\n"
@@ -377,10 +377,10 @@ def main():
         logger.debug("Start Main Loop")
         try:
             check_mentions()
-        except RequestException:
+        #except RequestException:
             # Usually occurs when Reddit is not available. Non-fatal, but annoying.
-            logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
-            time.sleep(30)
+        #    logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
+        #    time.sleep(30)
         except Exception as err:
             logger.exception("Unknown Exception in Main Loop")
             try:

@@ -11,6 +11,12 @@ import praw
 from RedditUserData import get_User_Data
 import operator
 import configparser
+import ssl
+import urllib2
+
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
 
 #LOG_LEVEL = logging.INFO
 LOG_LEVEL = logging.DEBUG
