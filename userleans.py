@@ -10,7 +10,7 @@ import logging.handlers
 import time
 import os
 import sys
-sys.path.append('../userdata')
+sys.path.append("%s/github/bots/userdata" % os.getenv("HOME"))
 from enum import Enum
 import praw
 import prawcore
@@ -20,7 +20,8 @@ import operator
 from datetime import datetime 
 from dateutil import relativedelta
 import random
-
+#import pprint
+#pp = pprint.PrettyPrinter(indent=4)
 
 # =============================================================================
 # GLOBALS
@@ -28,7 +29,8 @@ import random
 
 # Reads the config file
 config = configparser.ConfigParser()
-config.read("bot.cfg")
+config.read("%s/github/bots/userleansbot/bot.cfg" % os.getenv("HOME"))
+#config.read("bot_test.cfg")
 
 bot_username = config.get("Reddit", "username")
 bot_password = config.get("Reddit", "password")
@@ -223,13 +225,15 @@ def try_send_report(message, report_user, from_user):
     if message.was_comment:
         parent=message.parent()
         if parent.author is None:
-            if selftext in parent:
+            try:
                 if parent.selftext == '[deleted]':
                     logger.error("# post deleted, account may or may not be deleted")
                     return
                 if parent.selftext == '[removed]':
                     logger.error("# post removed and account deleted")
                     return
+            except:
+                    logger.debug("# Unable to find post selftext")
         parentlink=parent.permalink
         itemlink="https://www.reddit.com/%s" % parentlink
         itemsub=parent.subreddit
@@ -294,6 +298,8 @@ def try_send_report(message, report_user, from_user):
 
     User_Data = get_User_Data(reddit, report_user, Search_Sub_List)
     usersummary = get_user_summary(User_Data,SortedSearchSubs)
+    
+    #pp.pprint(User_Data)
 
 
     # reply to user
@@ -305,15 +311,16 @@ def try_send_report(message, report_user, from_user):
     userreport += "\n"
     userreport += "Summary: **%s**\n" % (usersummary)
     userreport += "\n"
-    userreport += " Subreddit|Lean|No. of comments|Total comment karma|Median words per comment|No. of posts|Total post karma|Top 3 words used|\n"
-    userreport += " :--|:--|:--|:--|:--|:--|:--|:--|:--|:--\n"
+    userreport += " Subreddit|Lean|No. of comments|Total comment karma|Median words / comment|Pct with profanity|Avg comment grade level|No. of posts|Total post karma|Top 3 words used|\n"
+    userreport += " :--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--\n"
     for sreddit, stype in SortedSearchSubs:
         if sreddit in User_Data: 
             if User_Data[sreddit]['c_count'] > 0 or User_Data[sreddit]['s_count'] > 0:
+                #print ("SUB: %s" % sreddit)
                 #sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
                 sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
 
-                userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Data[sreddit]['c_count'], User_Data[sreddit]['c_karma'], User_Data[sreddit]['c_median_length'],User_Data[sreddit]['s_count'], User_Data[sreddit]['s_karma'], User_Data[sreddit]['top_words'])
+                userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Data[sreddit]['c_count'], User_Data[sreddit]['c_karma'], User_Data[sreddit]['c_median_length'],User_Data[sreddit]['p_pct'], User_Data[sreddit]['grade_level'],User_Data[sreddit]['s_count'], User_Data[sreddit]['s_karma'], User_Data[sreddit]['top_words'])
     userreport += "\n"
 
     userreport += "***\n"

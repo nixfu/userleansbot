@@ -5,18 +5,16 @@ import logging
 import time
 import os
 import sys
-sys.path.append('../userdata')
+sys.path.append("%s/github/bots/userdata" % os.getenv("HOME"))
 from enum import Enum
 import praw
-from RedditUserData import get_User_Data
+from RedditUserData_new import get_User_Data
+from user_summary import get_user_summary
+
 import operator
 import configparser
-import ssl
-import urllib2
-
-ctx = ssl.create_default_context()
-ctx.check_hostname = False
-ctx.verify_mode = ssl.CERT_NONE
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 #LOG_LEVEL = logging.INFO
 LOG_LEVEL = logging.DEBUG
@@ -29,7 +27,7 @@ logger.addHandler(log_stderrHandler)
 
 # Reads the config file
 config = configparser.ConfigParser()
-config.read("bot.cfg")
+config.read("%s/github/bots/userleansbot/bot.cfg" % os.getenv("HOME"))
 
 bot_username = config.get("Reddit", "username")
 bot_password = config.get("Reddit", "password")
@@ -60,4 +58,9 @@ print ("Checking User=%s" % user)
 # TEST FUNCTION
 User_Karma = {}
 User_Karma = get_User_Data(reddit,user,Search_Sub_List)
-print (User_Karma)
+
+User_Summary = get_user_summary(User_Karma,SortedSearchSubs)
+pp.pprint(User_Karma)
+
+print ("------------------------------")
+pp.pprint(User_Summary)
