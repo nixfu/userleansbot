@@ -34,7 +34,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
         else:
             continue
 
-        # counts weight 10x > karma
+        # counts weight 1x  karma
         SubValue = SubKarma
         SubTotals[sreddit] += SubValue
 
@@ -45,7 +45,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
         UserCount += SubCount
         
 
-    if UserCount < 10:
+    if UserCount < 20:
         #return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
         return "This user does not have enough activity in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
     
@@ -64,14 +64,14 @@ def get_user_summary(User_Data, SortedSearchSubs):
 
     if len(list(Sorted_SubTotals.keys())) >= 1:
         TopSub = list(Sorted_SubTotals.keys())[-1]
-        if SubTotals[TopSub] < 0:
+        if SubTotals[TopSub] < 25:
             TopSub = ""
     else:
         TopSub = ""
 
     if len(list(Sorted_SubTotals.keys())) >= 2:
         SecondSub = list(Sorted_SubTotals.keys())[-2]
-        if SubTotals[SecondSub] < 0:
+        if SubTotals[SecondSub] < 25:
             SecondSub = ""
     else:
         SecondSub= ""
