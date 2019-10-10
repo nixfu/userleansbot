@@ -384,10 +384,10 @@ def main():
         logger.debug("Start Main Loop")
         try:
             check_mentions()
-        #except RequestException:
-            # Usually occurs when Reddit is not available. Non-fatal, but annoying.
-        #    logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
-        #    time.sleep(30)
+        except RequestException:
+           # Usually occurs when Reddit is not available. Non-fatal, but annoying.
+            logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
+            time.sleep(30)
         except Exception as err:
             logger.exception("Unknown Exception in Main Loop")
             try:
