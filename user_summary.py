@@ -114,7 +114,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
         withword=random.choice(anarchy_words)
     elif "conservative" in TopSub.lower() or "conservative" in SecondSub.lower():
         withword=random.choice(conservative_words)
-    elif "politics" in TopSub.lower() or "politics" in SecondSub.lower():
+    elif "politics" == TopSub.lower() or "politics" == SecondSub.lower():
         withword=random.choice(liberal_words)
     elif TopCat_pct > 75 and TopCat == 'libertarian':
         withword=random.choice(libertarian_words)
