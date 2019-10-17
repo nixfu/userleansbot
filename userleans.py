@@ -344,7 +344,7 @@ def try_send_report(message, report_user, from_user):
         return
     except prawcore.exceptions.Forbidden as e:
         logger.error("# [BANNED from sub]:  %s" % itemsub)
-        send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+        send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good little bot.  You can also request reports via PM by sending just the username.")
         logger.error("# [SENT PM notice to user that I am banned]")
         return
     except Exception as e:
