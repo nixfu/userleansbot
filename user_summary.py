@@ -76,7 +76,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
     else:
         SecondSub= ""
 
-    print("Top Cat: %s pct=%s TopSub: %s" % (TopCat, TopCat_pct, TopSub))
+    print("Top Cat: %s pct=%s TopSub: %s SecondSub:%s" % (TopCat, TopCat_pct, TopSub, SecondSub))
 
     if TopCat_pct > 75:
         leansword="leans heavy"
@@ -106,7 +106,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
         withword=random.choice(communism_words)
     elif "socialism" in TopSub.lower() or "socialism" in SecondSub.lower():
         withword=random.choice(socialism_words)
-    elif "the_donald" in TopSub.lower() or "the_donald" in SecondSub.lower():
+    elif "the_donald" == TopSub.lower() or "the_donald" == SecondSub.lower():
         withword=random.choice(donald_words)
     elif "anarchis" in TopSub.lower() or "anarchis" in SecondSub.lower():
         withword=random.choice(communism_words)
