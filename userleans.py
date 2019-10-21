@@ -324,7 +324,7 @@ def try_send_report(message, report_user, from_user):
     userreport += "\n"
 
     userreport += "***\n"
-    userreport += " ^(Bleep, bloop, I'm a bot trying to help inform political discussions on Reddit.) ^| [^About](https://www.reddit.com/user/userleansbot/comments/au1pva/faq_about_userleansbot/)\n "
+    userreport += " ^(Bleep, bloop, I'm a bot trying to help inform political discussions on Reddit.) ^| [^About](https://np.reddit.com/user/userleansbot/comments/au1pva/faq_about_userleansbot/)\n "
     userreport += "___\n"
 
     try:
@@ -381,7 +381,7 @@ def main():
         logger.error("bot already running! Will not start.")
 
     while start_process and os.path.isfile(RUNNING_FILE):
-        logger.debug("Start Main Loop")
+        #logger.debug("Start Main Loop")
         try:
             check_mentions()
         except RequestException:
@@ -395,8 +395,8 @@ def main():
             except Exception as err:
                 logger.exception("Unknown error sending dev pm")
 
-        logger.debug("End Main Loop")
-        time.sleep(30)
+        #logger.debug("End Main Loop")
+        time.sleep(60)
 
     logger.info("end")
 
