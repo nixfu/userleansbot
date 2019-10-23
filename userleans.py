@@ -325,7 +325,7 @@ def try_send_report(message, report_user, from_user):
     userreport += "\n"
 
     userreport += "***\n"
-    userreport += " ^(Bleep, bloop, I'm a bot trying to help inform political discussions on Reddit.) ^| [^About](https://www.reddit.com/user/userleansbot/comments/au1pva/faq_about_userleansbot/)\n "
+    userreport += " ^(Bleep, bloop, I'm a bot trying to help inform political discussions on Reddit.) ^| [^About](https://np.reddit.com/user/userleansbot/comments/au1pva/faq_about_userleansbot/)\n "
     userreport += "___\n"
 
     try:
@@ -345,7 +345,7 @@ def try_send_report(message, report_user, from_user):
         return
     except prawcore.exceptions.Forbidden as e:
         logger.error("# [BANNED from sub]:  %s" % itemsub)
-        send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good litle bot.  You can also request reports via PM by sending just the username.")
+        send_user_pm(from_user, "Sorry Banned", "Sorry, the administrators of the subreddit you just posted in have banned me from posting. Please contact them and tell them I am very nice, and I promise to be a good little bot.  You can also request reports via PM by sending just the username.")
         logger.error("# [SENT PM notice to user that I am banned]")
         return
     except Exception as e:
@@ -382,13 +382,13 @@ def main():
         logger.error("bot already running! Will not start.")
 
     while start_process and os.path.isfile(RUNNING_FILE):
-        logger.debug("Start Main Loop")
+        #logger.debug("Start Main Loop")
         try:
             check_mentions()
-        #except RequestException:
-            # Usually occurs when Reddit is not available. Non-fatal, but annoying.
-        #    logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
-        #    time.sleep(30)
+        except RequestException:
+           # Usually occurs when Reddit is not available. Non-fatal, but annoying.
+            logger.error("Failed to check mentions due to connection error. sleep extra 30 before restarting loop.")
+            time.sleep(30)
         except Exception as err:
             logger.exception("Unknown Exception in Main Loop")
             try:
@@ -396,8 +396,8 @@ def main():
             except Exception as err:
                 logger.exception("Unknown error sending dev pm")
 
-        logger.debug("End Main Loop")
-        time.sleep(30)
+        #logger.debug("End Main Loop")
+        time.sleep(60)
 
     logger.info("end")
 
