@@ -30,6 +30,7 @@ import random
 # Reads the config file
 config = configparser.ConfigParser()
 config.read("%s/github/bots/userleansbot/bot.cfg" % os.getenv("HOME"))
+config.read("%s/github/bots/userleansbot/auth.cfg" % os.getenv("HOME"))
 #config.read("bot_test.cfg")
 
 bot_username = config.get("Reddit", "username")
