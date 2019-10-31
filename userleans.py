@@ -170,12 +170,16 @@ def process_pm(message):
     :param message: the Reddit comment containing the command
     """
     pmcommand_match = re.search(CommandRegex.pm_commandsearch, message.body, re.IGNORECASE)
+    command_match = re.search(CommandRegex.commandsearch, message.body, re.IGNORECASE)
 
     if pmcommand_match and pmcommand_match.group(2):
         try_send_report(message, pmcommand_match.group(2), message.author.name)
+    elif command_match and command_match.group(2):
+        try_send_report(message, command_match.group(2), message.author.name)
     else:
         try:
             logger.error("# Recieved UNKNOWN COMMAND: %s" % message.body)
+            #send_user_pm(message.author.name, "UNKNOWN Command", "Sorry, this was an unknown command. Try just sending the username alone in a PM.")
         except praw.exceptions.APIException as e:
             if e.error_type == 'DELETED_COMMENT' in str(e):
                 print("Comment " + comment.id + " was deleted")
