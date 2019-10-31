@@ -219,6 +219,14 @@ def process_mention(mention):
         if parentcomment and parentcomment.author and mention.author:
             CACHE_REPLIES.append(parentcomment.id)    
             try_send_report(mention, parentcomment.author.name, mention.author.name)
+    else:
+        try:
+            logger.error("# Recieved UNKNOWN Comment: %s" % mention.body)
+        except praw.exceptions.APIException as e:
+            print(e)
+
+
+
 
 def try_send_report(message, report_user, from_user):
     """
