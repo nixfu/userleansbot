@@ -47,7 +47,8 @@ def get_user_summary(User_Data, SortedSearchSubs):
 
     if UserCount < 20:
         #return "Sorry, not enough user activity on political subs for analysis, this user probably has a life"
-        return "This user does not have enough activity in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
+        #return "This user does not have enough activity in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types. I don't trust them."
+        return "Leans Boomer.  This user does not have enough activity in political subs for analysis or has no clear leanings, they might be one of those weirdo moderate types."
     
     Sorted_SubTotals = {k: v for k, v in sorted(SubTotals.items(), key=lambda x: x[1])}
     Sorted_CatTotals = {k: v for k, v in sorted(CatTotals.items(), key=lambda x: x[1])}
@@ -97,7 +98,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
     donald_words=   [ ', and most likely has a closet full of MAGA hats' , ', and is probably a graduate of Trump University' ]
     anarchy_words=  [ ', and they attend antifa protests whenever their mom will give them a ride', ', and they keep their protest gear in their moms minivan' ]
     conservative_words= [ ', and is likely also conservative so when you agree with them, say mega dittos', ', and might be conservative so they are probably arguing with you while having one hand tied behind their back just to make it fair', ', and is probably a conservative who thinks their talent is on loan from god', ', and probably joined Paul Ryan\'s gym to hang out with him', ', and enjoys tea parties with Ann Coulter', ', and tunes into turning point USA and Prager U to learn the real truth' ]
-    liberal_words = [ ', and they are also a /politics fan, so they probably have MSNBC on in the room right now', ', and they might believe that AOC is the greatest thinker in more than 100 years', ', and still has a Hillary2016 sticker on their Prius' ]
+    liberal_words = [ ', and they are also a /politics fan, so they probably have MSNBC on in the room right now', ', and they might believe that AOC is the greatest thinker in more than 100 years', ', and still has a Hillary2016 sticker on their Prius', ', and they believe Trump is the most guilty man in all of history, but they just don\'t know what exactly he is guilty of....Yet' ]
     libertarian_words = [ ', and believes gay married couples should be able to protect ther Marijuana plants with fully automatic weapons', ', and wants to take over the world so they can leave you the hell alone', ', and voted for Gary Johnson while complaining that Gary Johnson isn\'t actually a libertarian', ', and would happily wash Ron Paul\'s car for free', ', and wouldn\'t dream of a aggressing upon you unless you aggressed upon them first', ', and just wants you to admit that taxation IS theft', '' , '', '']
 
     if "communis" in TopSub.lower() or "communis" in SecondSub.lower():
