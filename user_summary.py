@@ -77,7 +77,7 @@ def get_user_summary(User_Data, SortedSearchSubs):
     else:
         SecondSub= ""
 
-    print("Top Cat: %s pct=%s TopSub: %s SecondSub:%s" % (TopCat, TopCat_pct, TopSub, SecondSub))
+    #print("Top Cat: %s pct=%s TopSub: %s SecondSub:%s" % (TopCat, TopCat_pct, TopSub, SecondSub))
 
     if TopCat_pct > 75:
         leansword="leans heavy"

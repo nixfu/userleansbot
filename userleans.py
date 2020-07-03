@@ -29,8 +29,8 @@ import random
 
 # Reads the config file
 config = configparser.ConfigParser()
-config.read("%s/github/bots/userleansbot/bot.cfg" % os.getenv("HOME"))
-config.read("%s/github/bots/userleansbot/auth.cfg" % os.getenv("HOME"))
+config.read("%s/github/bots/userleansbot/bot.cfg" % (os.getenv("HOME")))
+config.read("%s/github/bots/userleansbot/auth.cfg" % (os.getenv("HOME")))
 #config.read("bot_test.cfg")
 
 bot_username = config.get("Reddit", "username")
@@ -56,8 +56,8 @@ DEV_USER_NAME = config.get("BOT", "dev_user")
 
 RUNNING_FILE = "bot.pid"
 
-#LOG_LEVEL = logging.INFO
-LOG_LEVEL = logging.DEBUG
+LOG_LEVEL = logging.INFO
+#LOG_LEVEL = logging.DEBUG
 LOG_FILENAME = "bot.log"
 LOG_FILE_BACKUPCOUNT = 10
 LOG_FILE_INTERVAL = 2
@@ -97,9 +97,16 @@ class CommandType(Enum):
     UNKNOWN = 3
 
 class CommandRegex:
-    commandsearch = r'^(\/*u*\/*{bot_username})+\s*\/*u*\/*([-\w]*)\s*$'.format(bot_username=bot_username)
+    #commandsearch = r'^(\/*u*\/*{bot_username})+\s*\/*u*\/*([-\w]*)\s*$'.format(bot_username=bot_username)
+    #commandsearch = r'^(\/*u*\/)*({bot_username})+\s*\/*u*\/*([-\w]*)\s*(short)*\s*$'.format(bot_username=bot_username)
+    #commandsearch = r'^(\/*u*\/)*({bot_username})+\s*(short)*\s*\/*u*\/*([-\w]*)\s*$'.format(bot_username=bot_username)
+    commandsearch = r'^(\/*u*\/)*({bot_username})+\s*(short|sum)*\s*(\/*u*\/)*([-\w]*)\s*$'.format(bot_username=bot_username)
     #pm_commandsearch = r'^\/*u*\/*(\w*)\s*$'
-    pm_commandsearch = r'^(\/*u\/)*([-\w]*)\s*$'
+    #pm_commandsearch = r'^(\/*u\/)*([-\w]*)\s*$'
+    #pm_commandsearch = r'^(\/*u\/)*([-\w]*)\s*(short)*\s*$'
+    #pm_commandsearch = r'^(\/*u\/)\s*(short)*\s*([-\w]*)\s*$'
+    pm_commandsearch = r'^\s*(short|sum)*\s*(\/*u\/)*\s*([-\w]*)\s*$'
+	
 
 # =============================================================================
 # FUNCTIONS
@@ -172,10 +179,18 @@ def process_pm(message):
     pmcommand_match = re.search(CommandRegex.pm_commandsearch, message.body, re.IGNORECASE)
     command_match = re.search(CommandRegex.commandsearch, message.body, re.IGNORECASE)
 
-    if pmcommand_match and pmcommand_match.group(2):
-        try_send_report(message, pmcommand_match.group(2), message.author.name)
-    elif command_match and command_match.group(2):
-        try_send_report(message, command_match.group(2), message.author.name)
+    #if pmcommand_match:
+    #    pmcommand_match_count = len(pmcommand_match.groups())
+    #    logger.info("# pmcommand_match_count = %s" % pmcommand_match_count)
+    #    for x in range(1,pmcommand_match_count+1):
+    #        logger.info("pmc[%s]=%s" % (x, pmcommand_match.group(x)))
+    #        logger.info(pmcommand_match.groups())
+
+    reportsize = ''
+    if pmcommand_match and pmcommand_match.group(3):
+        try_send_report(message, pmcommand_match.group(3), message.author.name, pmcommand_match.group(1))
+    elif command_match and command_match.group(5):
+        try_send_report(message, command_match.group(5), message.author.name, reportsize, command_match.group(3))
     else:
         try:
             logger.error("# Recieved UNKNOWN COMMAND: %s" % message.body)
@@ -193,6 +208,7 @@ def process_mention(mention):
     process the command in the mention by determining the command and delegating the processing
     :param mention: the Reddit comment containing the command
     """
+    reportsize=''
 
     command_match = re.search(CommandRegex.commandsearch, mention.body, re.IGNORECASE)
 
@@ -212,23 +228,29 @@ def process_mention(mention):
     else:
         itemlink=""
 
-    if command_match and command_match.group(2):
-        try_send_report(mention, command_match.group(2), mention.author.name)
-    elif command_match and command_match.group(1):
+    #if command_match:
+    #    command_match_count = len(command_match.groups())
+    #    logger.info("# command_match_count = %s" % command_match_count)
+    #    for x in range(1,command_match_count+1):
+    #        logger.info("c[%s]=%s" % (x, command_match.group(x)))
+
+    if command_match and command_match.group(5):
+            try_send_report(mention, command_match.group(5), mention.author.name,command_match.group(3))
+    elif command_match and command_match.group(2):
         parentcomment = mention.parent()
         if parentcomment and parentcomment.author and mention.author:
             CACHE_REPLIES.append(parentcomment.id)    
-            try_send_report(mention, parentcomment.author.name, mention.author.name)
+            try_send_report(mention, parentcomment.author.name, mention.author.name, command_match.group(3))
     else:
         try:
-            logger.error("# Recieved UNKNOWN Comment: %s" % mention.body)
+            logger.error("# Recieved UNKNOWN Comment: %s LINK (%s)" % (mention.body, itemlink))
         except praw.exceptions.APIException as e:
             print(e)
 
 
 
 
-def try_send_report(message, report_user, from_user):
+def try_send_report(message, report_user, from_user, reportsize):
     """
     send report to from_user about report_user
     :param message: the Reddit comment containing the command
@@ -300,7 +322,7 @@ def try_send_report(message, report_user, from_user):
             time.sleep(15)
             return 
 
-    logger.info("Generate Report about %s to %s %s" % (report_user, from_user, itemlink))
+    logger.info("Generate %s Report about %s to %s %s" % (reportsize,report_user, from_user, itemlink))
 
     try:
         useraccountage = get_useraccount_age(report_user)
@@ -324,17 +346,31 @@ def try_send_report(message, report_user, from_user):
     userreport += "\n"
     userreport += "Summary: **%s**\n" % (usersummary)
     userreport += "\n"
-    userreport += " Subreddit|Lean|No. of comments|Total comment karma|Median words / comment|Pct with profanity|Avg comment grade level|No. of posts|Total post karma|Top 3 words used|\n"
-    userreport += " :--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--\n"
-    for sreddit, stype in SortedSearchSubs:
-        if sreddit in User_Data: 
-            if User_Data[sreddit]['c_count'] > 0 or User_Data[sreddit]['s_count'] > 0:
-                #print ("SUB: %s" % sreddit)
-                #sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
-                sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
+    if reportsize == "sum":
+        userreport += "\n"
+    elif reportsize == "short":
+        summarydata = {'left': 0, 'right': 0, 'libertarian': 0}
+        for sreddit, stype in SortedSearchSubs:
+            if sreddit in User_Data: 
+                if User_Data[sreddit]['c_count'] > 0 or User_Data[sreddit]['s_count'] > 0:
+                    summarydata[stype] += User_Data[sreddit]['s_karma'] + User_Data[sreddit]['c_karma']
+        userreport += " Subreddit Categories|Total Karma|\n"
+        userreport += " :--|:--|\n"
+        for mytype in summarydata:
+            userreport += "%s|%s\n" % (mytype, summarydata[mytype])
+    else:
+        userreport += " Subreddit|Lean|No. of comments|Total comment karma|Median words / comment|Pct with profanity|Avg comment grade level|No. of posts|Total post karma|Top 3 words used|\n"
+        userreport += " :--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--|:--\n"
+        for sreddit, stype in SortedSearchSubs:
+            if sreddit in User_Data: 
+                if User_Data[sreddit]['c_count'] > 0 or User_Data[sreddit]['s_count'] > 0:
+                    #print ("SUB: %s" % sreddit)
+                    #sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
+                    sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
 
-                userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Data[sreddit]['c_count'], User_Data[sreddit]['c_karma'], User_Data[sreddit]['c_median_length'],User_Data[sreddit]['p_pct'], User_Data[sreddit]['grade_level'],User_Data[sreddit]['s_count'], User_Data[sreddit]['s_karma'], User_Data[sreddit]['top_words'])
-    userreport += "\n"
+                    userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Data[sreddit]['c_count'], User_Data[sreddit]['c_karma'], User_Data[sreddit]['c_median_length'],User_Data[sreddit]['p_pct'], User_Data[sreddit]['grade_level'],User_Data[sreddit]['s_count'], User_Data[sreddit]['s_karma'], User_Data[sreddit]['top_words'])
+        userreport += "\n"
+
 
     userreport += "***\n"
     userreport += " ^(Bleep, bloop, I'm a bot trying to help inform political discussions on Reddit.) ^| [^About](https://np.reddit.com/user/userleansbot/comments/au1pva/faq_about_userleansbot/)\n "
@@ -411,7 +447,7 @@ def main():
             except Exception as err:
                 logger.exception("Unknown error sending dev pm")
 
-        #logger.debug("End Main Loop")
+        logger.debug("End Main Loop-sleep 60")
         time.sleep(60)
 
     logger.info("end")
