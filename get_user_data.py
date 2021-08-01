@@ -8,7 +8,7 @@ import sys
 sys.path.append("%s/github/bots/userdata" % os.getenv("HOME"))
 from enum import Enum
 import praw
-from RedditUserData_new import get_User_Data
+from RedditUserData_push import get_User_Data
 from user_summary import get_user_summary
 
 import operator
@@ -28,6 +28,7 @@ logger.addHandler(log_stderrHandler)
 # Reads the config file
 config = configparser.ConfigParser()
 config.read("%s/github/bots/userleansbot/bot.cfg" % os.getenv("HOME"))
+config.read("%s/github/bots/userleansbot/auth.cfg" % os.getenv("HOME"))
 
 bot_username = config.get("Reddit", "username")
 bot_password = config.get("Reddit", "password")

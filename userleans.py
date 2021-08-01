@@ -14,7 +14,8 @@ sys.path.append("%s/github/bots/userdata" % os.getenv("HOME"))
 from enum import Enum
 import praw
 import prawcore
-from RedditUserData import get_User_Data
+#from RedditUserData_push import get_User_Data
+from RedditUserData_new import get_User_Data
 from user_summary import get_user_summary
 import operator
 from datetime import datetime 
@@ -32,6 +33,8 @@ config = configparser.ConfigParser()
 config.read("%s/github/bots/userleansbot/bot.cfg" % (os.getenv("HOME")))
 config.read("%s/github/bots/userleansbot/auth.cfg" % (os.getenv("HOME")))
 #config.read("bot_test.cfg")
+
+database = "%s/github/bots/userleansbot/usersdata.db" % os.getenv("HOME")
 
 bot_username = config.get("Reddit", "username")
 bot_password = config.get("Reddit", "password")
@@ -304,7 +307,7 @@ def try_send_report(message, report_user, from_user, reportsize):
             logger.error("# [APIException]["+ e.error_type+"]: " + e.message)
             if e.error_type== 'RATELIMIT':
                 logger.error("# [APIException][RATELIMIT]: time=%s %s" % (e.sleep_time, str(reddit.auth.limits)))
-                time.sleep(600)
+                time.sleep(60)
                 return
             if e.error_type== 'DELETED_COMMENT' or 'TOO_OLD' or 'THREAD_LOCKED':
                 logger.error("# DELETED/TOO_OLD/THREAD_LOCKED " + str(e))
@@ -322,7 +325,7 @@ def try_send_report(message, report_user, from_user, reportsize):
             time.sleep(15)
             return 
 
-    logger.info("Generate %s Report about %s to %s %s" % (reportsize,report_user, from_user, itemlink))
+    logger.info("Generate %s Report about %s to %s %s" % (reportsize, report_user, from_user, itemlink))
 
     try:
         useraccountage = get_useraccount_age(report_user)
@@ -331,7 +334,7 @@ def try_send_report(message, report_user, from_user, reportsize):
         send_user_pm(from_user, "Unknown User", "Sorry, this user does not exist: %s" % report_user)
         return 
 
-    User_Data = get_User_Data(reddit, report_user, Search_Sub_List)
+    User_Data = get_User_Data(reddit, report_user, Search_Sub_List, 7, 'reddit', 'FULL', database)
     usersummary = get_user_summary(User_Data,SortedSearchSubs)
     
     #pp.pprint(User_Data)
@@ -340,7 +343,8 @@ def try_send_report(message, report_user, from_user, reportsize):
     # reply to user
     userreport = "Author: /u/userleansbot\n"
     userreport += "___\n"
-    userreport += "Analysis of /u/%s's activity in political subreddits over the past 1000 comments and submissions.\n" % report_user
+    #userreport += "Analysis of /u/%s's activity in political subreddits over the past 1000 comments and submissions.\n" % report_user
+    userreport += "Analysis of /u/%s's activity in political subreddits over past comments and submissions.\n" % report_user
     userreport += "\n"
     userreport += "Account Created: %s\n" % (useraccountage)
     userreport += "\n"
@@ -366,7 +370,8 @@ def try_send_report(message, report_user, from_user, reportsize):
                 if User_Data[sreddit]['c_count'] > 0 or User_Data[sreddit]['s_count'] > 0:
                     #print ("SUB: %s" % sreddit)
                     #sreddit_link="https://redditsearch.io/?term=&dataviz=true&aggs=true&subreddits=%s&searchtype=posts,comments,aggs,stats,dataviz&search=true&start=0&size=1000&authors=%s" % (sreddit, report_user)
-                    sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
+                    #sreddit_link="https://redditsearch.io/?term=&dataviz=false&aggs=false&subreddits=%s&searchtype=posts,comments&search=true&start=0&end=%s&size=1000&authors=%s" % (sreddit, int(time.time()), report_user)
+                    sreddit_link="https://www.reddit.com/r/%s/search?q=author:%s&restrict_sr=on&sort=new&feature=legacy_search" % (sreddit, report_user)
 
                     userreport += "[/r/%s](%s)|%s|%s|%s|%s|%s|%s|%s|%s|%s\n" % (sreddit, sreddit_link, stype, User_Data[sreddit]['c_count'], User_Data[sreddit]['c_karma'], User_Data[sreddit]['c_median_length'],User_Data[sreddit]['p_pct'], User_Data[sreddit]['grade_level'],User_Data[sreddit]['s_count'], User_Data[sreddit]['s_karma'], User_Data[sreddit]['top_words'])
         userreport += "\n"
@@ -447,8 +452,8 @@ def main():
             except Exception as err:
                 logger.exception("Unknown error sending dev pm")
 
-        logger.debug("End Main Loop-sleep 60")
-        time.sleep(60)
+        logger.debug("End Main Loop-sleep 15")
+        time.sleep(15)
 
     logger.info("end")
 
