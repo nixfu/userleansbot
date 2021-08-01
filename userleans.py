@@ -14,8 +14,7 @@ sys.path.append("%s/github/bots/userdata" % os.getenv("HOME"))
 from enum import Enum
 import praw
 import prawcore
-#from RedditUserData_push import get_User_Data
-from RedditUserData_new import get_User_Data
+from RedditUserData import get_User_Data
 from user_summary import get_user_summary
 import operator
 from datetime import datetime 
